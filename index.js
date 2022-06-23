@@ -1,17 +1,17 @@
 const express = require('express');
 const fileUpload= require('express-fileupload');
-
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const ObjectId = require('mongodb').ObjectId;
 const crypto = require('crypto');
 var moment = require('moment'); 
 require('dotenv').config();
-
 const path= require('path');
+
 
 const app = express();
 const port =process.env.PORT || 5000;
+
 
 // middleware
 app.use(cors());
@@ -34,14 +34,12 @@ async function run() {
     try {
   
       await client.connect();
-  
-      const database = client.db("Tirtha_Database");
-  
+      const database = client.db("Tirtha_Database");  
       const novelsCollection = database.collection("Novels");
       const artworksCollection =  database.collection("Artworks");
-  
+
+
       // create a document to insert novels
-  
       app.post('/api/novels', async(request,response)=>{
         const {
           name, 
@@ -50,21 +48,19 @@ async function run() {
           genre,
           tags,
         } = request.body;
-        console.log(request.body);
+        const views=0;
+        const ratings=0;
+        const likes =0;  
+        const chapters=[];
+        // console.log(request.body);
         const {image} = request.files; //use image as key name
-        console.log(image.name);
-
-        const imagename=Date.now() + crypto.randomBytes(20).toString('hex') + 'novels'+ image.name;//image.mimetype
-        
+        // console.log(image.name);
+        const imagename=Date.now() + crypto.randomBytes(20).toString('hex') + 'novels'+ image.name;//image.mimetype               
         image.mv(`${__dirname}/novels_images/${imagename}`,err=>{
           if (err){
             console.log(err);
           }
         });
-        const views=0;
-        const ratings=0;
-        const likes =0;  
-        const chapters=[];
         const result = await novelsCollection.insertOne({
           name, 
           author,
@@ -81,8 +77,8 @@ async function run() {
         response.send(result);
       });
 
-      //get all the novels
 
+      //get all the novels
       app.get('/api/novels', async(request,response)=>{     
         const getNovelList= novelsCollection.find({});
         const NovelList =await getNovelList.toArray();
@@ -131,10 +127,11 @@ async function run() {
       });
 
 
-      //novel ends here
+      /**********************novel ends here****************************/
 
 
-      //artwork begins here
+      /**********************artwork begins here***********************/
+
 
       //add artwork
       app.post('/api/artworks', async(request,response)=>{
@@ -143,20 +140,14 @@ async function run() {
           artist,
           subheader,
         } = request.body;
-        console.log(request.body);
+        const views=0;
         const {image} = request.files; //use image as key name
-        console.log(image.name);
-
-         const imagename=Date.now() + crypto.randomBytes(20).toString('hex') +'artwork'+ image.name;//image.mimetype
-       
-        
+        const imagename=Date.now() + crypto.randomBytes(20).toString('hex') +'artwork'+ image.name;//image.mimetype
         image.mv(`${__dirname}/artwork_images/${imagename}`,err=>{
           if (err){
             console.log(err);
           }
         });
-  
-        const views=0;
         const result = await artworksCollection.insertOne({
           title, 
           artist,
@@ -164,32 +155,26 @@ async function run() {
           subheader,
           imagename
         });
-    
         console.log(`A document was inserted with the _id: ${result.insertedId}`);
-
         response.send(result);
       });
 
+
+
       //get all the artwork
       app.get('/api/artworks', async(request,response)=>{
-
         const getArtworkList= artworksCollection.find({});
-
         const artworkList =await getArtworkList.toArray();
-
         response.send(artworkList);
       });
 
+
+
       //get a particular arkwork
-
       app.get('/api/artworks/:id', async(request,response)=>{
-
         const id= request.params.id;
-
         const query ={_id: ObjectId(id) };
-
         const artwork =await artworksCollection.findOne(query);
-
         response.send(artwork);
 
       });
