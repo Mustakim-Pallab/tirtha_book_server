@@ -19,6 +19,7 @@ app.use(express.json());
 app.use(bodyParser.json());
 app.use('/api/images',express.static('novels_images'));
 app.use('/api/images',express.static('artwork_images'));
+app.use('/api/images',express.static('stored_content'));
 app.use(fileUpload());
 
 
@@ -37,6 +38,7 @@ async function run() {
       const database = client.db("Tirtha_Database");  
       const novelsCollection = database.collection("Novels");
       const artworksCollection =  database.collection("Artworks");
+      const storedContentCollection = database.collection("Stored_Content");
 
 
       // create a document to insert novels
@@ -188,8 +190,135 @@ async function run() {
         console.log("deleted: ",result);
         res.json(result);
       });
+/*****************************Artwork ends here***************************/
+
+/*****************************Stored Content Begins Here******************/
+
+app.post('/api/storedContent', async(request,response)=>{
+  const doc ={
+    title : "Hello to Stored Content",
+  }
+  const result = await storedContentCollection.insertOne(doc);
+
+    console.log(`A document was inserted with the _id: ${result.insertedId}`);
+    response.send(result);
+
+});
+
+app.patch('/api/storedContent/heroSlider1/:id',async(request,res)=>{
+  const id=request.params.id;
+  const query ={_id:ObjectId(id)};
+  console.log(request.files);
+  const {heroSlider1} = request.files; //use image as key name
+  const imagename=Date.now() + crypto.randomBytes(20).toString('hex') + 'heroSlider1'+ heroSlider1.name;//image.mimetype               
+  heroSlider1.mv(`${__dirname}/stored_content/${imagename}`,err=>{
+
+    if (err){
+      console.log(err);
+    }
+  });
+  const options ={upsert:true};
+  const updateImg={
+    $set:{
+      heroSlider1: imagename,
+    }
+  };
+  const result=await storedContentCollection.updateOne(query,updateImg,options);
+  console.log("updated");
+  res.json(result)
+});
+app.patch('/api/storedContent/heroSlider2/:id',async(request,res)=>{
+        const id=request.params.id;
+        const query ={_id:ObjectId(id)};
+        console.log(request.files);
+        const {heroSlider2} = request.files; //use image as key name
+        const imagename=Date.now() + crypto.randomBytes(20).toString('hex') + 'heroSlider2'+ heroSlider2.name;//image.mimetype               
+        heroSlider2.mv(`${__dirname}/stored_content/${imagename}`,err=>{
+
+          if (err){
+            console.log(err);
+          }
+        });
+        const options ={upsert:true};
+        const updateImg={
+          $set:{
+            heroSlider2: imagename,
+          }
+        };
+        const result=await storedContentCollection.updateOne(query,updateImg,options);
+        console.log("updated");
+        res.json(result)
+});
+
+app.patch('/api/storedContent/heroSlider3/:id',async(request,res)=>{
+  const id=request.params.id;
+  const query ={_id:ObjectId(id)};
+  const {heroSlider3} = request.files; //use image as key name
+  const imagename=Date.now() + crypto.randomBytes(20).toString('hex') + 'heroSlider3'+ heroSlider3.name;//image.mimetype               
+  heroSlider3.mv(`${__dirname}/stored_content/${imagename}`,err=>{
+    if (err){
+      console.log(err);
+    }
+  });
+  const options ={upsert:true};
+  const updateImg={
+    $set:{
+      heroSlider3: imagename,
+    }
+  };
+  const result=await storedContentCollection.updateOne(query,updateImg,options);
+  console.log("updated");
+  res.json(result)
+});
+
+app.patch('/api/storedContent/novelThumbnail/:id',async(request,res)=>{
+  const id=request.params.id;
+  const query ={_id:ObjectId(id)};
+  const {novelThumbnail} = request.files; //use image as key name
+  const imagename=Date.now() + crypto.randomBytes(20).toString('hex') + 'novelThumbnail'+ novelThumbnail.name;//image.mimetype               
+  novelThumbnail.mv(`${__dirname}/stored_content/${imagename}`,err=>{
+    if (err){
+      console.log(err);
+    }
+  });
+  const options ={upsert:true};
+  const updateImg={
+    $set:{
+      novelThumbnail : imagename,
+    }
+  };
+  const result=await storedContentCollection.updateOne(query,updateImg,options);
+  console.log("updated");
+  res.json(result)
+});
 
 
+app.patch('/api/storedContent/artworkThumbnail/:id',async(request,res)=>{
+  const id= request.params.id;
+  const query ={_id:ObjectId(id)};
+  const {artworkThumbnail} = request.files; //use image as key name
+  const imagename=Date.now() + crypto.randomBytes(20).toString('hex') + 'artwork_thumbnail'+ artworkThumbnail.name;//image.mimetype               
+  artworkThumbnail.mv(`${__dirname}/stored_content/${imagename}`,err=>{
+    if (err){
+      console.log(err);
+    }
+  });
+  const options ={upsert:true};
+  const updateImg={
+    $set:{
+      artworkThumbnail: imagename,
+    }
+  };
+  const result=await storedContentCollection.updateOne(query,updateImg,options);
+  console.log("updated");
+  res.json(result)
+});
+
+app.get('/api/storedContent', async(request,response)=>{
+  const getstoredContent= storedContentCollection.find({});
+  const storedContent =await getstoredContent.toArray();
+  response.send(storedContent);
+});
 
     } finally {
   
