@@ -194,17 +194,6 @@ async function run() {
 
 /*****************************Stored Content Begins Here******************/
 
-app.post('/api/storedContent', async(request,response)=>{
-  const doc ={
-    title : "Hello to Stored Content",
-  }
-  const result = await storedContentCollection.insertOne(doc);
-
-    console.log(`A document was inserted with the _id: ${result.insertedId}`);
-    response.send(result);
-
-});
-
 app.patch('/api/storedContent/heroSlider1/:id',async(request,res)=>{
   const id=request.params.id;
   const query ={_id:ObjectId(id)};
